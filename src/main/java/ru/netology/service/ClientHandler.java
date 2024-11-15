@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-import static ru.netology.ServerMain.logger;
+import static ru.netology.service.Server.logger;
 
 public class ClientHandler implements Runnable {
     private static final ConcurrentHashMap<PrintWriter, Boolean> clientWriters = new ConcurrentHashMap<>();
@@ -44,7 +44,8 @@ public class ClientHandler implements Runnable {
         clientName = in.readLine();
         if (clientName != null) {
             logger.info("Клиент " + clientName + " присоединился.");
-            out.println("Добро пожаловать " + clientName + "!");
+            out.println("Добро пожаловать " + clientName + "! Для выхода из чата введите \"/exit\"");
+            messageSending("Клиент " + clientName + " присоединился.");
         } else {
             logger.warning("Клиент отключился до ввода имени.");
         }
@@ -57,7 +58,7 @@ public class ClientHandler implements Runnable {
         while ((message = in.readLine()) != null) {
             if (message.equalsIgnoreCase("/exit")) {
                 logger.info("Клиент " + clientName + " отключился.");
-                out.println("До скорой встречи " + clientName + "!");
+                messageSending("Клиент " + clientName + " отключился.");
                 break;
             }
             String timeMessage = new SimpleDateFormat("HH:mm:ss").format(new Date());
@@ -77,9 +78,9 @@ public class ClientHandler implements Runnable {
     }
 
     private synchronized void messageSending(String logMessage) {
-            for (PrintWriter writer : clientWriters.keySet()) {
-                writer.println(logMessage);
-            }
+        for (PrintWriter writer : clientWriters.keySet()) {
+            writer.println(logMessage);
+        }
     }
 
     private void resourceClosing() {
